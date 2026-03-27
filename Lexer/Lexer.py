@@ -3,7 +3,9 @@ import ply.lex as lex
 class YaadmanLexer:
     reserved = {
         'mek': 'MEK', 'show': 'SHOW', 'try': 'TRY',
-        'ketch': 'KETCH', 'if': 'IF', 'den': 'DEN', 'else': 'ELSE'
+        'ketch': 'KETCH', 'if': 'IF', 'den': 'DEN', 'else': 'ELSE', 
+        'while': 'WHILE', 'for': 'FOR','true': 'TRUE', 'false': 'FALSE',
+        'null': 'NULL', 'const': 'CONST'
     }
 
     tokens = [
@@ -34,10 +36,17 @@ class YaadmanLexer:
         t.value = float(t.value) if '.' in t.value else int(t.value)
         return t
 
+    def t_STRING(self, t):
+        r'\"([^\\\n]|(\\.))*?\"'
+        t.value = t.value[1:-1]
+        return t
 
+    def t_newline(self, t):
+        r'\n+'
+        t.lexer.lineno += len(t.value)
 
     def t_error(self, t):
-        print(f"Illegal character '{t.value[0]}'")
+        print(f"Yaadman Error: Illegal character '{t.value[0]}' at line {t.lexer.lineno}")
         t.lexer.skip(1)
 
 # Initialize the object
