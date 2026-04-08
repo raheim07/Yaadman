@@ -12,51 +12,36 @@ app = Flask(__name__)
 
 # ── PLACEHOLDER INTERPRETER ──────────────────
 # Replace this section with your actual code.
-
-class YaadmanInterpreter:
-    """
-    Drop-in placeholder.  Replace with your real
-    Lexer → Parser → Semantic Analyzer → Interpreter pipeline.
-    """
-    def run(self, source: str) -> str:
-        lines = source.strip().splitlines()
-        output_lines = []
-        for line in lines:
-            line = line.strip()
-            if not line or line.startswith("//"):
-                continue
-            # Tiny demo: echo recognised keywords
-            if line.startswith("print "):
-                value = line[6:].strip().strip('"').strip("'")
-                output_lines.append(value)
-            elif line.startswith("var "):
-                output_lines.append(f"[declared] {line[4:]}")
-            else:
-                output_lines.append(f"[exec] {line}")
-        return "\n".join(output_lines) if output_lines else "(no output)"
+from Yaadman.Parser import parse, ASTNode, YaadmanSyntaxError
+from Yaadman.Interpreter import Interpreter
+from Yaadman.Lexer import YaadmanLexer
+from Yaadman.Interpreter import SemanticAnalyzer
 
 # ─────────────────────────────────────────────
 
 
 def run_yaadman(source: str):
-    """Run source through the interpreter, capture output + errors."""
     stdout_capture = io.StringIO()
     stderr_capture = io.StringIO()
+    old_stdout, old_stderr = sys.stdout, sys.stderr
+
     try:
-        interp = YaadmanInterpreter()
-        # If your interpreter prints to stdout, redirect it:
-        old_stdout, old_stderr = sys.stdout, sys.stderr
         sys.stdout, sys.stderr = stdout_capture, stderr_capture
+
+        interp = Interpreter()
         result = interp.run(source)
-        sys.stdout, sys.stderr = old_stdout, old_stderr
 
         printed = stdout_capture.getvalue()
-        output  = printed if printed else (result or "")
+        output = printed if printed else (result or "")
+
         return {"success": True, "output": output, "error": ""}
+
     except Exception:
-        sys.stdout, sys.stderr = sys.__stdout__, sys.__stderr__
         err = traceback.format_exc()
         return {"success": False, "output": "", "error": err}
+
+    finally:
+        sys.stdout, sys.stderr = old_stdout, old_stderr
 
 
 @app.route("/")
@@ -73,19 +58,27 @@ def run_code():
     result = run_yaadman(source)
     return jsonify(result)
 
-
 @app.route("/analyze", methods=["POST"])
 def analyze_tokens():
-    """Return token stream for the lexer-view panel."""
-    data   = request.get_json(force=True)
+    data = request.get_json(force=True)
     source = data.get("code", "")
-    # ── Replace with your actual Lexer call ──
-    # e.g.  tokens = Lexer(source).tokenize()
-    # For now, return a simple word-level mock:
-    tokens = []
-    for i, word in enumerate(source.split()):
-        tokens.append({"index": i, "type": "TOKEN", "value": word})
-    return jsonify({"tokens": tokens})
+
+    try:
+        lexer = YaadmanLexer(source)
+        tokens = lexer.tokenize()
+
+        formatted = []
+        for i, token in enumerate(tokens):
+            formatted.append({
+                "index": i,
+                "type": token.type,
+                "value": str(token.value)
+            })
+
+        return jsonify({"tokens": formatted})
+
+    except Exception:
+        return jsonify({"tokens": [], "error": traceback.format_exc()})
 
 
 if __name__ == "__main__":
