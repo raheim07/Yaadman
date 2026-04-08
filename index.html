@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>YaadmanLang IDE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <!-- ── TOP BAR ── -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <span class="logo-mark">⬡</span>
+      <span class="logo-name">YaadmanLang</span>
+      <span class="logo-tag">IDE</span>
+    </div>
+    <nav class="topbar-nav">
+      <button class="nav-btn active" data-panel="editor">Editor</button>
+      <button class="nav-btn" data-panel="tokens">Token View</button>
+      <button class="nav-btn" data-panel="about">About</button>
+    </nav>
+    <div class="topbar-right">
+      <span class="status-dot" id="statusDot"></span>
+      <span class="status-text" id="statusText">Ready</span>
+    </div>
+  </header>
+
+  <!-- ── MAIN LAYOUT ── -->
+  <main class="workspace">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">EXAMPLES</div>
+        <ul class="example-list">
+          <li class="example-item" data-snippet="hello">Hello World</li>
+          <li class="example-item" data-snippet="vars">Variables</li>
+          <li class="example-item" data-snippet="loop">Loop</li>
+          <li class="example-item" data-snippet="func">Function</li>
+        </ul>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">SHORTCUTS</div>
+        <div class="shortcut-row"><kbd>Ctrl</kbd><kbd>↵</kbd><span>Run</span></div>
+        <div class="shortcut-row"><kbd>Ctrl</kbd><kbd>L</kbd><span>Clear</span></div>
+        <div class="shortcut-row"><kbd>Ctrl</kbd><kbd>T</kbd><span>Tokens</span></div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">LANGUAGE</div>
+        <div class="lang-info">
+          <div class="lang-info-row"><span>Name</span><span>YaadmanLang</span></div>
+          <div class="lang-info-row"><span>Type</span><span>Interpreted</span></div>
+          <div class="lang-info-row"><span>Version</span><span>1.0</span></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- PANELS CONTAINER -->
+    <div class="panels">
+
+      <!-- EDITOR PANEL -->
+      <div class="panel active" id="panel-editor">
+        <div class="editor-area">
+          <div class="pane-header">
+            <span class="pane-title">Source Code</span>
+            <div class="pane-actions">
+              <button class="icon-btn" id="clearBtn" title="Clear (Ctrl+L)">✕ Clear</button>
+              <button class="run-btn" id="runBtn" title="Run (Ctrl+Enter)">
+                <span class="run-icon">▶</span> Run
+              </button>
+            </div>
+          </div>
+          <div class="editor-wrapper">
+            <div class="line-numbers" id="lineNumbers">1</div>
+            <textarea
+              id="codeEditor"
+              class="code-editor"
+              spellcheck="false"
+              autocomplete="off"
+              placeholder="// Write your YaadmanLang code here...&#10;print &quot;Hello, Yaadman!&quot;"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="output-area">
+          <div class="pane-header">
+            <span class="pane-title">Output</span>
+            <div class="pane-actions">
+              <span class="exec-time" id="execTime"></span>
+              <button class="icon-btn" id="copyBtn">⎘ Copy</button>
+            </div>
+          </div>
+          <div class="output-wrapper" id="outputWrapper">
+            <pre class="output-content" id="outputContent"><span class="output-placeholder">// Output will appear here...</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOKEN VIEW PANEL -->
+      <div class="panel" id="panel-tokens">
+        <div class="pane-header">
+          <span class="pane-title">Lexer · Token Stream</span>
+          <button class="run-btn small" id="analyzeBtn">⬡ Analyze</button>
+        </div>
+        <div class="token-grid-wrapper">
+          <div class="token-grid" id="tokenGrid">
+            <div class="token-placeholder">Click <strong>Analyze</strong> to tokenize the code in the editor.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ABOUT PANEL -->
+      <div class="panel" id="panel-about">
+        <div class="about-content">
+          <h1 class="about-title">YaadmanLang</h1>
+          <p class="about-sub">A custom programming language built for the Programming Languages Analysis course.</p>
+          <div class="about-grid">
+            <div class="about-card">
+              <div class="about-card-icon">⬡</div>
+              <h3>Lexer</h3>
+              <p>Tokenises source text into a stream of typed tokens: keywords, identifiers, literals, operators.</p>
+            </div>
+            <div class="about-card">
+              <div class="about-card-icon">⬡</div>
+              <h3>Parser</h3>
+              <p>Builds an Abstract Syntax Tree from the token stream using a recursive-descent grammar.</p>
+            </div>
+            <div class="about-card">
+              <div class="about-card-icon">⬡</div>
+              <h3>Semantic Analyzer</h3>
+              <p>Validates scoping, type rules, and bindings before execution to catch logical errors early.</p>
+            </div>
+            <div class="about-card">
+              <div class="about-card-icon">⬡</div>
+              <h3>Interpreter</h3>
+              <p>Tree-walks the AST to execute statements and expressions in a managed runtime environment.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /panels -->
+  </main>
+
+  <!-- ── TOAST ── -->
+  <div class="toast" id="toast"></div>
+
+  <script src="/static/js/main.js"></script>
+</body>
+</html>
