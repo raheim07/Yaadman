@@ -2,6 +2,15 @@ from flask import Flask, request, jsonify, render_template
 import sys
 import io
 import traceback
+from Parser import parse
+from utils import tokenize   # your tokenize() function
+from Parser import ASTNode
+import os
+import google.generativeai as genai
+
+os.environ["GOOGLE_API_KEY"] = "AIzaSyBJsGfzvWWKJuvBcXvqS5LLVM596iI9bGM"
+genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
+model = genai.GenerativeModel("gemini-2.5-flash")
 
 app = Flask(__name__)
 
@@ -58,27 +67,73 @@ def run_code():
     result = run_yaadman(source)
     return jsonify(result)
 
-@app.route("/analyze", methods=["POST"])
-def analyze_tokens():
-    data = request.get_json(force=True)
-    source = data.get("code", "")
+
+@app.route("/ast", methods=["POST"])
+def get_ast():
+    data = request.get_json()
+    code = data.get("code", "")
 
     try:
-        lexer = YaadmanLexer(source)
-        tokens = lexer.tokenize()
+        tree = parse(code)
+        return jsonify({
+            "ast": tree.to_dict()
+        })
+    except Exception as e:
+        return jsonify({
+            "error": str(e)
+        }), 400
 
-        formatted = []
-        for i, token in enumerate(tokens):
-            formatted.append({
-                "index": i,
-                "type": token.type,
-                "value": str(token.value)
-            })
 
-        return jsonify({"tokens": formatted})
+# LLM Integration for output
+@app.route("/llm", methods=["POST"])
+def llm_execute():
+    data = request.get_json()
+    code = data.get("code", "")
 
-    except Exception:
-        return jsonify({"tokens": [], "error": traceback.format_exc()})
+    prompt = f"""
+    You are an interpreter for a programming language called YaadmanLang.
+
+    Simulate execution step by step.
+
+    Return in this format:
+
+    [Execution Trace]
+    - Step 1:
+    - Step 2:
+
+    [Output]
+
+    [Final State]
+
+    Code:
+    {code}
+    """
+
+    try:
+        response = model.generate_content(prompt)
+
+        return jsonify({
+            "output": response.text
+        })
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+        
+    
+@app.route("/analyze", methods=["POST"])
+def analyze():
+    data = request.get_json()
+    code = data.get("code", "")
+
+    tokens = tokenize(code)
+
+    # add index for frontend
+    for i, t in enumerate(tokens):
+        t["index"] = i+1
+
+    return jsonify({
+        "tokens": tokens
+    })
 
 
 if __name__ == "__main__":

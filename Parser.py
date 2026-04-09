@@ -38,6 +38,17 @@ class ASTNode:
 
     def pretty(self):
         return self.__repr__()
+    
+    def to_dict(self):
+        return {
+            "type": self.node_type,
+            "value": self.value,
+            "children": [
+                child.to_dict()
+                for child in self.children
+                if isinstance(child, ASTNode)
+                ]
+            }
 
 
 precedence = (

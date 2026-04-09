@@ -301,3 +301,38 @@ kbd {
   white-space: nowrap;
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.ast-grid-wrapper {
+  height: 100%;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.ast-grid {
+  font-family: monospace;
+}
+
+.ast-node {
+  margin-left: 10px;
+}
+
+.ast-label {
+  color: #00ffaa;
+  cursor: pointer;
+}
+
+.ast-children {
+  margin-left: 20px;
+  border-left: 1px solid #444;
+  padding-left: 10px;
+}
+
+.hidden {
+  display: none;
+}
+
+.llm-output {
+  font-family: monospace;
+  color: #c084fc;
+  white-space: pre-wrap;
+}
