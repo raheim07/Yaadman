@@ -21,6 +21,7 @@ class YaadmanLexer:
         'Text': 'TEXT_TYPE',
         'True': 'TRUE',
         'False': 'FALSE',
+        'Boolean': 'BOOLEAN_TYPE',
     }
 
     tokens = [
@@ -89,6 +90,10 @@ class YaadmanLexer:
     def t_error(self, t):
         print(f"Illegal character '{t.value[0]}' at line {t.lexer.lineno}")
         t.lexer.skip(1)
+    
+    def t_COMMENT(self, t):
+        r'//.*'
+        pass
 
 # Initialize the object
 yaadman_lexer = YaadmanLexer()

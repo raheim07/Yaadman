@@ -1,5 +1,5 @@
 import ply.yacc as yacc
-from Yaadman.Lexer import YaadmanLexer
+from Lexer import YaadmanLexer
 
 tokens = YaadmanLexer.tokens
 
@@ -138,6 +138,10 @@ def p_assignment(p):
         ],
         lineno=p.lineno(1)
     )
+    
+def p_type_boolean(p):
+    'type : BOOLEAN_TYPE'
+    p[0] = 'boolean'
 
 
 # =========================================================

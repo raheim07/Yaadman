@@ -12,10 +12,10 @@ app = Flask(__name__)
 
 # ── PLACEHOLDER INTERPRETER ──────────────────
 # Replace this section with your actual code.
-from Yaadman.Parser import parse, ASTNode, YaadmanSyntaxError
-from Yaadman.Interpreter import Interpreter
-from Yaadman.Lexer import YaadmanLexer
-from Yaadman.Interpreter import SemanticAnalyzer
+from Parser import parse, ASTNode, YaadmanSyntaxError
+from Interpreter import Interpreter
+from Lexer import YaadmanLexer
+from Interpreter import SemanticAnalyzer
 
 # ─────────────────────────────────────────────
 
@@ -29,7 +29,7 @@ def run_yaadman(source: str):
         sys.stdout, sys.stderr = stdout_capture, stderr_capture
 
         interp = Interpreter()
-        result = interp.run(source)
+        result = interp.run_program(source)
 
         printed = stdout_capture.getvalue()
         output = printed if printed else (result or "")

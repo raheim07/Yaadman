@@ -7,6 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/css/style.css">
+  <!-- Monaco loader -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
 </head>
 <body>
   <!-- ── TOP BAR ── -->
@@ -72,16 +74,8 @@
               </button>
             </div>
           </div>
-          <div class="editor-wrapper">
-            <div class="line-numbers" id="lineNumbers">1</div>
-            <textarea
-              id="codeEditor"
-              class="code-editor"
-              spellcheck="false"
-              autocomplete="off"
-              placeholder="// Write your YaadmanLang code here...&#10;print &quot;Hello, Yaadman!&quot;"
-            ></textarea>
-          </div>
+          <!-- Monaco mounts here — no textarea, no line-numbers div -->
+          <div id="monacoEditor"></div>
         </div>
 
         <div class="output-area">

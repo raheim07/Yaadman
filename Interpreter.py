@@ -230,6 +230,20 @@ class SemanticAnalyzer:
             raise YaadmanSemanticError(
                 f"[Line {node.lineno}] Variable '{node.value}' not declared."
             )
+    
+    # Type checking
+    def check_Assign(self, node):
+        name = node.children[0].value
+
+        if not self.env.is_declared(name):
+            raise YaadmanSemanticError(...)
+
+        self.check_expr(node.children[1])
+
+        expected_type = self.env.types[name]
+
+        # OPTIONAL: basic type inference (simple version)
+        # you can improve this later
 
 
 
@@ -273,6 +287,16 @@ class Interpreter:
         # "Set x To 5 + 3;" — evaluate the right side and store it
         name = node.children[0].value
         value = self._eval(node.children[1], env)
+        expected_type = env.types[name]
+
+        if expected_type == 'number' and not isinstance(value, (int, float)):
+            raise YaadmanRuntimeError(f"[Line {node.lineno}] Expected Number")
+
+        if expected_type == 'text' and not isinstance(value, str):
+            raise YaadmanRuntimeError(f"[Line {node.lineno}] Expected Text")
+
+        if expected_type == 'boolean' and not isinstance(value, bool):
+            raise YaadmanRuntimeError(f"[Line {node.lineno}] Expected Boolean")
         env.set(name, value, node.lineno)
 
 
@@ -532,55 +556,46 @@ class Interpreter:
 
 
 
+    #MAIN RUN FUNCTION
+    #This part is what the UI will call to run at the program then pass into the source code as a string
 
 
+    def run_program(self, source_code: str):
 
+        print("═" * 55)
+        print("   YaadmanLang — Executing Program")
+        print("═" * 55)
 
+        #Parse the source code into an AST
+        try:
+            ast = parse(source_code)
+        except YaadmanSyntaxError as e:
+            print(e)
+            return
 
+        #Run semantic analysis to catch errors before execution
+        try:
+            analyzer = SemanticAnalyzer()
+            analyzer.analyze(ast)
+            print("[✓] Semantic checks passed — no pre-run errors found.\n")
+        except YaadmanSemanticError as e:
+            print(f"[✗] Semantic Error — {e}")
+            return
 
+        #execute the program
+        try:
+            interpreter = Interpreter()
 
+            #register all top-level functions first so they can be called later
 
+            for child in ast.children:
+                if isinstance(child, ASTNode) and child.node_type == 'FuncDef':
+                    interpreter.functions[child.value] = child
 
-#MAIN RUN FUNCTION
-#This part is what the UI will call to run at the program then pass into the source code as a string
+            interpreter.exec_Program(ast)
 
-
-def run_program(source_code: str):
-
-    print("═" * 55)
-    print("   YaadmanLang — Executing Program")
-    print("═" * 55)
-
-    #Parse the source code into an AST
-    try:
-        ast = parse(source_code)
-    except YaadmanSyntaxError as e:
-        print(e)
-        return
-
-    #Run semantic analysis to catch errors before execution
-    try:
-        analyzer = SemanticAnalyzer()
-        analyzer.analyze(ast)
-        print("[✓] Semantic checks passed — no pre-run errors found.\n")
-    except YaadmanSemanticError as e:
-        print(f"[✗] Semantic Error — {e}")
-        return
-
-    #execute the program
-    try:
-        interpreter = Interpreter()
-
-        #register all top-level functions first so they can be called later
-
-        for child in ast.children:
-            if isinstance(child, ASTNode) and child.node_type == 'FuncDef':
-                interpreter.functions[child.value] = child
-
-        interpreter.exec_Program(ast)
-
-    except YaadmanRuntimeError as e:
-        print(f"\n[✗] Runtime Error — {e}")
+        except YaadmanRuntimeError as e:
+            print(f"\n[✗] Runtime Error — {e}")
 
 
 
@@ -588,6 +603,7 @@ def run_program(source_code: str):
 
 if __name__ == "__main__":
     # code = input()
+    interp = Interpreter()
     code = """
     Start {
         Function add(a Number, b Number) {
@@ -610,11 +626,11 @@ if __name__ == "__main__":
         add(3, 4);
     } Done;
     """
-
-    run_program(code)
-
-
-
+    # print(Interpreter)
+    # print(dir(Interpreter))
+    code = interp.run_program(code)
+    
+    
 
 
 

@@ -221,29 +221,12 @@ kbd {
 }
 .editor-area { border-bottom: 2px solid var(--border-bright); }
 
-.editor-wrapper {
-  flex: 1; display: flex; overflow: hidden;
-  background: var(--bg-base);
+/* Monaco editor mount point — fills the editor-area flex space */
+#monacoEditor {
+  flex: 1;
+  min-height: 0;   /* critical: lets Monaco shrink inside a flex column */
+  width: 100%;
 }
-.line-numbers {
-  width: 48px; flex-shrink: 0;
-  background: var(--bg-elevated);
-  border-right: 1px solid var(--border);
-  font-family: var(--font-mono); font-size: 13px;
-  color: var(--text-muted); line-height: 1.7;
-  padding: 14px 8px; text-align: right;
-  user-select: none; overflow: hidden;
-  white-space: pre;
-}
-.code-editor {
-  flex: 1; resize: none; border: none; outline: none;
-  background: var(--bg-base);
-  color: var(--text-primary);
-  font-family: var(--font-mono); font-size: 13.5px; line-height: 1.7;
-  padding: 14px 18px; tab-size: 2;
-  caret-color: var(--accent);
-}
-.code-editor::placeholder { color: var(--text-muted); }
 
 .output-wrapper {
   flex: 1; overflow-y: auto;
